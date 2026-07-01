@@ -1,0 +1,39 @@
+body {
+  background: #eef4fb;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.navbar {
+  background: linear-gradient(135deg, #154360, #2980b9) !important;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 3px 20px rgba(0, 0, 0, 0.09);
+}
+
+.stat-card {
+  border-radius: 8px;
+  padding: 22px;
+  color: #fff;
+}
+
+.stat-blue { background: linear-gradient(135deg, #2980b9, #154360); }
+.stat-green { background: linear-gradient(135deg, #27ae60, #1a5e37); }
+.stat-orange { background: linear-gradient(135deg, #e67e22, #922b21); }
+.stat-purple { background: linear-gradient(135deg, #8e44ad, #512e5f); }
+
+.table thead th {
+  background: #dbeafe;
+  border: none;
+}
+
+tr.low td {
+  background: #fff5f5 !important;
+}
+
+th,
+td {
+  vertical-align: middle !important;
+}

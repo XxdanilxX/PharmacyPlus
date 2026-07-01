@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+instance/
+
+# Visual Studio and OS artifacts
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.db
+*.sqlite3
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+
+# Distribution
+*.egg-info/
+dist/
+build/
+env/

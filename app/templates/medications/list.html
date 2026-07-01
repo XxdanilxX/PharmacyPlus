@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Медикаменти | АптекаПлюс{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold text-primary mb-0">Медикаменти</h4>
+  <a href="/medications/add" class="btn btn-primary">Додати медикамент</a>
+</div>
+
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2">
+    <div class="col-md-5">
+      <input name="q" class="form-control" placeholder="Пошук за назвою..." value="{{ search }}">
+    </div>
+    <div class="col-md-4">
+      <select name="cat" class="form-select">
+        <option value="">Всі категорії</option>
+        {% for category in categories %}
+          <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100">Шукати</button>
+    </div>
+  </form>
+</div>
+
+<div class="card p-0">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Назва</th>
+        <th>Категорія</th>
+        <th>Ціна</th>
+        <th>Залишок</th>
+        <th>Виробник</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for medication in medications %}
+        {% set low = medication.quantity <= medication.min_quantity %}
+        <tr class="{{ 'low' if low else '' }}">
+          <td>{{ medication.name }}</td>
+          <td>{{ medication.category }}</td>
+          <td>{{ "%.2f"|format(medication.price) }} грн</td>
+          <td>
+            {{ medication.quantity }} {{ medication.unit }}
+            {% if low %}
+              <span class="badge bg-danger">Малий запас</span>
+            {% else %}
+              <span class="badge bg-success">В нормі</span>
+            {% endif %}
+          </td>
+          <td>{{ medication.manufacturer or "-" }}</td>
+          <td>
+            <a href="/medications/edit/{{ medication._id }}" class="btn btn-sm btn-outline-primary me-1">Редагувати</a>
+            <a href="/medications/delete/{{ medication._id }}" class="btn btn-sm btn-outline-danger"
+               onclick="return confirm('Видалити {{ medication.name }}?')">Видалити</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Нічого не знайдено.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

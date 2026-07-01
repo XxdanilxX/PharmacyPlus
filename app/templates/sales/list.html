@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Продажі | АптекаПлюс{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold text-primary mb-0">Журнал продажів</h4>
+  <a href="/sales/add" class="btn btn-primary">Зареєструвати продаж</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="stat-card stat-blue">
+      <div class="fs-2 fw-bold">{{ count }}</div>
+      <div class="opacity-75">Всього записів</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-green">
+      <div class="fs-2 fw-bold">{{ "%.0f"|format(total_revenue) }} ₴</div>
+      <div class="opacity-75">Загальна виручка</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-purple">
+      <div class="fs-2 fw-bold">{{ "%.1f"|format(average_bill) }} ₴</div>
+      <div class="opacity-75">Середній чек</div>
+    </div>
+  </div>
+</div>
+
+<div class="card p-0">
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Дата</th>
+        <th>Медикамент</th>
+        <th class="text-center">Кількість</th>
+        <th>Ціна</th>
+        <th>Сума</th>
+        <th>Аптека</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sale in sales %}
+        <tr>
+          <td>{{ sale.date.strftime("%d.%m.%Y %H:%M") }}</td>
+          <td>{{ sale.medication_name }}</td>
+          <td class="text-center">{{ sale.quantity }}</td>
+          <td>{{ "%.2f"|format(sale.price) }} грн</td>
+          <td class="fw-semibold">{{ "%.2f"|format(sale.total) }} грн</td>
+          <td>{{ sale.pharmacy }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Продажів ще немає.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="p-3">
+    <ul class="pagination pagination-sm mb-0">
+      {% for number in range(1, pages + 1) %}
+        <li class="page-item {{ 'active' if number == page else '' }}">
+          <a class="page-link" href="?page={{ number }}">{{ number }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

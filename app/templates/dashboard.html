@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Головна | АптекаПлюс{% endblock %}
+
+{% block content %}
+{% if seeded %}
+  <div class="alert alert-success alert-dismissible fade show">
+    База даних успішно заповнена тестовими даними.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+{% endif %}
+
+<h4 class="fw-bold text-primary mb-4">Панель керування</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card stat-blue">
+      <div class="fs-1 fw-bold">{{ total_meds }}</div>
+      <div class="opacity-75">Найменувань товарів</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card stat-orange">
+      <div class="fs-1 fw-bold">{{ low_stock|length }}</div>
+      <div class="opacity-75">Критично малий запас</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card stat-green">
+      <div class="fs-1 fw-bold">{{ "%.0f"|format(today_revenue) }} ₴</div>
+      <div class="opacity-75">Виручка сьогодні</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="stat-card stat-purple">
+      <div class="fs-1 fw-bold">{{ "%.0f"|format(total_stock_value) }} ₴</div>
+      <div class="opacity-75">Вартість складу</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card p-3 mb-3">
+      <h6 class="fw-bold mb-3">Критично малий запас ({{ low_stock|length }} позицій)</h6>
+      {% if not low_stock %}
+        <p class="text-success mb-0">Всі запаси в нормі.</p>
+      {% else %}
+        <table class="table table-sm table-hover mb-0">
+          <thead>
+            <tr><th>Назва</th><th>Категорія</th><th>Залишок</th><th>Мін.</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for med in low_stock %}
+              <tr>
+                <td>{{ med.name }}</td>
+                <td>{{ med.category }}</td>
+                <td class="text-danger fw-bold">{{ med.quantity }} {{ med.unit }}</td>
+                <td>{{ med.min_quantity }}</td>
+                <td><a href="/medications/edit/{{ med._id }}" class="btn btn-sm btn-warning">Поповнити</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Останні продажі</h6>
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr><th>Дата</th><th>Товар</th><th>Кількість</th><th>Сума</th><th>Аптека</th></tr>
+        </thead>
+        <tbody>
+          {% for sale in recent_sales %}
+            <tr>
+              <td>{{ sale.date.strftime("%d.%m.%Y %H:%M") }}</td>
+              <td>{{ sale.medication_name }}</td>
+              <td>{{ sale.quantity }}</td>
+              <td>{{ "%.2f"|format(sale.total) }} ₴</td>
+              <td>{{ sale.pharmacy }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted py-4">Продажів ще немає.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card p-3">
+      <h6 class="fw-bold mb-3">Виручка за тиждень за категоріями</h6>
+      <canvas id="catChart" height="280"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('catChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ category_labels|tojson }},
+    datasets: [{
+      label: 'Виручка, грн',
+      data: {{ category_values|tojson }},
+      backgroundColor: ['#2980b9', '#27ae60', '#e67e22', '#8e44ad', '#e74c3c', '#16a085'],
+      borderRadius: 6
+    }]
+  },
+  options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+{% endblock %}

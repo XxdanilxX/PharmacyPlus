@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Прогноз | АптекаПлюс{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold text-primary mb-4">Прогнозування попиту</h4>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="stat-card stat-orange">
+      <div class="fs-2 fw-bold">{{ results|selectattr("will_out")|list|length }}</div>
+      <div class="opacity-75">Закінчиться за 7 днів</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-blue">
+      <div class="fs-2 fw-bold">{{ results|selectattr("slope", "gt", 0.1)|list|length }}</div>
+      <div class="opacity-75">Зростаючий попит</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card stat-green">
+      <div class="fs-2 fw-bold">{{ results|selectattr("days_to_stock", "ge", 30)|list|length }}</div>
+      <div class="opacity-75">Стабільний запас</div>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <form method="get" class="d-flex align-items-center gap-2 mb-3">
+    <label class="form-label mb-0 fw-semibold">Графік для:</label>
+    <select name="med" class="form-select" style="max-width: 320px;">
+      {% for result in results %}
+        <option value="{{ result.name }}" {% if result.name == selected_name %}selected{% endif %}>{{ result.name }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary">Показати</button>
+  </form>
+
+  <h6 class="fw-bold">Факт за 14 днів + прогноз за 7 днів: {{ selected_name }}</h6>
+  <canvas id="forecastChart" height="90"></canvas>
+</div>
+
+<div class="card p-0">
+  <div class="p-3">
+    <h6 class="fw-bold mb-0">Прогноз попиту на 7 днів</h6>
+    <small class="text-muted">Червоний - вичерпається, жовтий - запас менше 14 днів, зелений - стабільно.</small>
+  </div>
+
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Медикамент</th>
+        <th>Категорія</th>
+        <th>Залишок</th>
+        <th>Ср/день</th>
+        <th>Тренд</th>
+        <th>Прогноз 7д</th>
+        <th>Запас</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for result in results %}
+        {% if result.will_out %}
+          {% set row_class = "table-danger" %}
+          {% set status = "червоний" %}
+        {% elif result.days_to_stock < 14 %}
+          {% set row_class = "table-warning" %}
+          {% set status = "жовтий" %}
+        {% else %}
+          {% set row_class = "" %}
+          {% set status = "зелений" %}
+        {% endif %}
+        {% set trend = "зростає" if result.slope > 0.1 else ("падає" if result.slope < -0.1 else "стабільно") %}
+        <tr class="{{ row_class }}">
+          <td>{{ status }} - {{ result.name }}</td>
+          <td>{{ result.category }}</td>
+          <td>{{ result.quantity }} {{ result.unit }}</td>
+          <td>{{ result.avg_daily }}</td>
+          <td>{{ trend }} {{ "%+.2f"|format(result.slope) }}</td>
+          <td class="fw-semibold">{{ result.forecast_sum }}</td>
+          <td>
+            {% if result.days_to_stock < 30 %}
+              <span class="text-danger fw-bold">{{ result.days_to_stock }} дн.</span>
+            {% else %}
+              {{ result.days_to_stock }} дн.
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Немає даних для прогнозу. Спочатку заповніть базу.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+new Chart(document.getElementById('forecastChart'), {
+  type: 'line',
+  data: {
+    labels: {{ labels|tojson }},
+    datasets: [
+      {
+        label: 'Фактичні продажі',
+        data: {{ history_values|tojson }},
+        borderColor: '#2980b9',
+        backgroundColor: 'rgba(41,128,185,.12)',
+        fill: true,
+        spanGaps: false,
+        pointRadius: 4,
+        tension: 0.3
+      },
+      {
+        label: 'Прогноз',
+        data: {{ forecast_values|tojson }},
+        borderColor: '#e67e22',
+        backgroundColor: 'rgba(230,126,34,.12)',
+        fill: true,
+        spanGaps: false,
+        borderDash: [7, 4],
+        pointRadius: 5,
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' }, tooltip: { mode: 'index' } },
+    scales: {
+      y: { beginAtZero: true, title: { display: true, text: 'Кількість' } },
+      x: { title: { display: true, text: 'Дата' } }
+    }
+  }
+});
+</script>
+{% endblock %}

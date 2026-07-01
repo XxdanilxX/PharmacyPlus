@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}АптекаПлюс{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-dark px-3 py-2 mb-4">
+    <span class="navbar-brand fw-bold fs-5">АптекаПлюс</span>
+    <div class="d-flex flex-wrap gap-1">
+      <a href="/" class="nav-link px-2 {{ 'fw-bold text-white' if active == 'home' else 'text-white-50' }}">Головна</a>
+      <a href="/medications/" class="nav-link px-2 {{ 'fw-bold text-white' if active == 'med' else 'text-white-50' }}">Медикаменти</a>
+      <a href="/sales/" class="nav-link px-2 {{ 'fw-bold text-white' if active == 'sales' else 'text-white-50' }}">Продажі</a>
+      <a href="/sales/add" class="nav-link px-2 {{ 'fw-bold text-white' if active == 'add' else 'text-white-50' }}">Новий продаж</a>
+      <a href="/forecast/" class="nav-link px-2 {{ 'fw-bold text-white' if active == 'forecast' else 'text-white-50' }}">Прогноз</a>
+      <a href="/seed" class="nav-link px-2 text-white-50">Заповнити БД</a>
+    </div>
+  </nav>
+
+  <main class="container-xl pb-5">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

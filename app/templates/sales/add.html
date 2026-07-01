@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Новий продаж | АптекаПлюс{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold text-primary mb-4">Реєстрація продажу</h4>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card p-4" style="max-width: 640px;">
+  <form method="post">
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Медикамент *</label>
+      <select name="medication_id" class="form-select" required>
+        {% for medication in medications %}
+          <option value="{{ medication._id }}">
+            {{ medication.name }} - {{ "%.2f"|format(medication.price) }} грн ({{ medication.quantity }} {{ medication.unit }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Кількість *</label>
+      <input name="quantity" type="number" min="1" value="1" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Аптека</label>
+      <select name="pharmacy" class="form-select">
+        {% for pharmacy in pharmacies %}
+          <option value="{{ pharmacy }}">{{ pharmacy }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-primary px-4">Зареєструвати</button>
+    <a href="/sales/" class="btn btn-secondary ms-2">Скасувати</a>
+  </form>
+</div>
+{% endblock %}

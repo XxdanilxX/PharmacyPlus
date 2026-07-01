@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | АптекаПлюс{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold text-primary mb-4">{{ title }}</h4>
+
+<div class="card p-4" style="max-width: 760px;">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Назва *</label>
+        <input name="name" class="form-control" value="{{ medication.name or '' }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Категорія *</label>
+        <select name="category" class="form-select">
+          {% for category in categories %}
+            <option value="{{ category }}" {% if medication.category == category %}selected{% endif %}>{{ category }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Ціна (грн) *</label>
+        <input name="price" type="number" step="0.01" min="0" class="form-control" value="{{ medication.price or 0 }}" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Кількість *</label>
+        <input name="quantity" type="number" min="0" class="form-control" value="{{ medication.quantity or 0 }}" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Мін. кількість *</label>
+        <input name="min_quantity" type="number" min="0" class="form-control" value="{{ medication.min_quantity or 10 }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Одиниця виміру</label>
+        <select name="unit" class="form-select">
+          {% for unit in units %}
+            <option value="{{ unit }}" {% if medication.unit == unit %}selected{% endif %}>{{ unit }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Виробник</label>
+        <input name="manufacturer" class="form-control" value="{{ medication.manufacturer or '' }}">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary px-4">Зберегти</button>
+        <a href="/medications/" class="btn btn-secondary ms-2">Скасувати</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
